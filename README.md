@@ -4,6 +4,67 @@
 - status.sh管理脚本没有啥用，它的安装和默认的目录有冲突而且会弄乱systemd参数。但可以用它卸载位于/etc/systemd里的service文件，当然也能手动删除。
 - 一键部署客户端每次更改参数都会重新下载各种文件，如果经常更改参数的话建议也用手动启动的方式。
 - release里面的.deb文件安装后和上面的一样，所以也没啥卵用😂
+
+**快速部署的内容**：
+一键部署客户端
+> 先按照前面的文档部署好你的 Server，请自行替换下面的 ssr.rs 为你的域名
+
+```bash
+# 参数说明
+# uid 对应 config.toml hosts 的 name
+# gid 对应 config.toml hosts_group 的 gid
+# pass 为对应的 uid/gid 密码
+# vnstat 默认 0: 不开启, 1: 开启
+# weight 排序加权
+# 下面参数要求 (version >= v1.5.1)
+# ping 0/1 默认 1 开启
+# tupd 0/1 默认 1 开启
+# extra 0/1 默认 1 开启
+# cn 0/1 默认 0 关闭  (cn加速，coding.net)
+# 下面参数要求 (version >= v1.5.2)
+# notify 0/1 默认 1 开启通知
+# type 可选指定显示的主机类型
+# loc 可选指定显示的主机位置 (暂不支持 emoji 表情符号)
+# 下面参数要求 (version >= v1.5.7)
+# vnstat-mr 默认 1，适配 vnstat month rotate 逻辑，可用值 1-28,
+# 下面参数要求 (version >= v1.6.1)
+# cm 移动 探测地址 eg. cm.abc.com:80
+# ct 电信 探测地址 eg. ct.abc.com:80
+# cu 联通 探测地址 eg. cu.abc.com:80
+# iface 指定网口统计
+# exclude-iface 排除网口统计
+# 下面参数要求 (version >= v1.7.1)
+# ip-source 指定 ip 信息源，可用值 ip-api.com / ip.sb / ipapi.co / myip.la
+# interval 上报间隔
+
+# 对应配置文件 config.toml 的 hosts
+# stat_client 一键安装命令
+curl -sSLf "https://ssr.rs/i?pass=p1&uid=h1" | bash
+
+# 对应配置文件 config.toml 的 hosts_group
+# stat_client 一键安装命令, 动态注册模式
+# 不同的主机可以运行相同的命令注册到同一组
+curl -sSLf "https://ssr.rs/i?pass=pp&gid=g1&alias=$(hostname)" | bash
+
+# 安装并启用 vnstat，细节参见 https://doc.ssr.rs/vnstat
+curl -sSLf "https://ssr.rs/i?pass=pp&gid=g1&vnstat=1&alias=$(hostname)" | bash
+# 指定 month rotate 为 7 号
+curl -sSLf "https://ssr.rs/i?pass=pp&gid=g1&vnstat=1&vnstat-mr=7&alias=$(hostname)" | bash
+
+# 指定 位置 & 类型
+curl -sSLf "https://ssr.rs/i?pass=pp&gid=g1&alias=$(hostname)&type=arm&loc=home" | bash
+
+# 安装并将这台 vps 置顶显示
+curl -sSLf "https://ssr.rs/i?pass=pp&gid=g1&weight=10000&alias=$(hostname)" | bash
+
+# 自定义 ping 地址
+curl -sSLf "https://ssr.rs/i?pass=pp&gid=g1&alias=$(hostname)&cm=cm.abc.com:80" | bash
+
+# 调试
+curl -sSLf "https://ssr.rs/i?pass=pp&gid=g1&vnstat=0&alias=$(hostname)" > ssr-client-init.sh
+bash -x ssr-client-init.sh
+```
+
 ---------
 
 原版：
